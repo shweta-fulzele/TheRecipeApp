@@ -3,6 +3,7 @@ package com.base.therecipeapp.presentation
 import android.annotation.SuppressLint
 import android.media.Image
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -33,17 +34,20 @@ import com.base.therecipeapp.data.viewmodels.RecipeViewModel
 
 @SuppressLint("NotConstructor")
 @Composable
-fun RecipeScreen(modifier: Modifier = Modifier) {
-    val recipeViewModel: RecipeViewModel = viewModel()
-    val viewState by recipeViewModel.categoriesState
+fun RecipeScreenUI(
+    modifier: Modifier = Modifier,
+    viewState: RecipeViewModel.RecipeState,
+    navigate: (Category) -> Unit
+) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
             viewState.loading -> {
-//                CircularProgressIndicator(modifier.align(Alignment.Center))
+                CircularProgressIndicator(modifier.align(Alignment.Center))
 
-                val url = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fdribbble.com%2Fshots%2F2186909-Food-Market-app-loader&psig=AOvVaw1NR9qJuHpnSqsGd4EFkGmN&ust=1704360866706000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCPDhqpX1wIMDFQAAAAAdAAAAABAI"
-                
+                val url =
+                    "https://www.google.com/url?sa=i&url=https%3A%2F%2Fdribbble.com%2Fshots%2F2186909-Food-Market-app-loader&psig=AOvVaw1NR9qJuHpnSqsGd4EFkGmN&ust=1704360866706000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCPDhqpX1wIMDFQAAAAAdAAAAABAI"
+
                 Image(
                     painter = rememberAsyncImagePainter(model = url),
                     contentDescription = null,
@@ -57,25 +61,31 @@ fun RecipeScreen(modifier: Modifier = Modifier) {
 
             else -> {
                 //Display Categories
-                CategoryScreenUI(viewState.list)
+                CategoryScreenUI(viewState.list) {
+                    navigate(it)
+                }
             }
         }
     }
 }
 
 @Composable
-fun CategoryScreenUI(categories: List<Category>) {
+fun CategoryScreenUI(categories: List<Category>, navigate: (Category) -> Unit) {
     LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.fillMaxSize()) {
         items(categories) { category ->
-            CategoryItem(category = category)
+            CategoryItem(category = category) {
+                navigate(it)
+            }
         }
     }
 }
 
 @Composable
-fun CategoryItem(category: Category) {
+fun CategoryItem(category: Category, navigate: (Category) -> Unit) {
     Column(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable { navigate(category) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
